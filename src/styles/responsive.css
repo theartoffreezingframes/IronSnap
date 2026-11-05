@@ -1,0 +1,477 @@
+/* ───────────────────────────────────────────────────────────────
+   Responsive layout — desktop → tablet → phone
+   ─────────────────────────────────────────────────────────────── */
+
+@media (max-height: 720px) and (min-width: 901px) {
+  :root {
+    --topbar-h: 66px;
+    --bottombar-h: 66px;
+  }
+  .panel--vision {
+    gap: 12px;
+    padding: 16px 18px;
+  }
+  .gesture-label {
+    font-size: 24px;
+  }
+  .event-log {
+    display: none;
+  }
+  .camera-stage {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media (max-width: 1180px) {
+  .brand-tag {
+    display: none;
+  }
+  .bottom-hints span:nth-child(n + 3) {
+    display: none;
+  }
+  .panel--vision {
+    width: 292px;
+  }
+  .panel-column--right {
+    width: 286px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .bottom-hints {
+    display: none;
+  }
+  .panel--vision {
+    width: 270px;
+    padding: 16px;
+  }
+  .panel-column--right {
+    width: 264px;
+  }
+  .manual-card__body {
+    display: none;
+  }
+}
+
+/* ── tablet / phone: stack the HUD ─────────────────────────────── */
+@media (max-width: 900px) {
+  :root {
+    --topbar-h: 64px;
+    --bottombar-h: 130px;
+  }
+
+  .topbar {
+    gap: 10px;
+    padding: 0 14px;
+  }
+
+  .brand-name {
+    font-size: 13px;
+    letter-spacing: 0.16em;
+  }
+
+  .brand-mark svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .system-status {
+    padding: 5px 9px;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+  }
+
+  .hud {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px 10px;
+    scrollbar-width: thin;
+  }
+
+  /* Panels keep their natural height inside the scrolling HUD. */
+  .hud > * {
+    flex: 0 0 auto;
+  }
+
+  .panel--vision,
+  .panel-column--right {
+    width: 100%;
+    max-height: none;
+  }
+
+  /* On phones the gesture readout is the primary instrument, so it leads. */
+  .panel--vision {
+    gap: 10px;
+    padding: 14px 16px;
+    order: 1;
+  }
+
+  .panel-column--right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    order: 2;
+  }
+
+  .panel--vision .readout {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+  }
+
+  .panel--vision .readout-row:nth-child(n) {
+    border-bottom: 1px solid rgba(96, 203, 237, 0.08);
+  }
+
+  .panel--telemetry .readout {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+  }
+
+  .mini-wave,
+  .manual-card {
+    display: none;
+  }
+
+  .bottombar {
+    align-content: center;
+    row-gap: 6px;
+    padding: 8px 12px;
+  }
+
+  .mode-selector {
+    padding: 4px;
+  }
+
+  .mode-button {
+    padding: 6px 12px;
+  }
+
+  .bottom-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .panel--camera {
+    grid-column: 1 / -1;
+    padding: 12px;
+  }
+
+  .camera-stage {
+    aspect-ratio: 16 / 9;
+  }
+
+  .panel--telemetry {
+    grid-column: 1 / -1;
+  }
+
+  .manual-card {
+    grid-column: 1 / -1;
+  }
+
+  .gesture-label {
+    font-size: 26px;
+  }
+
+  .event-log {
+    display: none;
+  }
+
+  .bottombar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 12px;
+    justify-content: space-between;
+  }
+
+  .mode-selector {
+    order: 1;
+    flex: 1 1 100%;
+  }
+
+  .bottom-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .toast-stack {
+    bottom: calc(var(--bottombar-h) + 10px);
+  }
+
+  .drawer__panel {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid var(--line-strong);
+    margin-top: 8vh;
+    border-radius: 14px 14px 0 0;
+    animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .drawer {
+    align-items: flex-end;
+  }
+
+  .key-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Narrow screens: the camera buttons switch to short labels via JS, the
+   redundant system pill is hidden so the primary action never wraps. */
+@media (max-width: 720px) {
+  .system-status {
+    display: none;
+  }
+  .top-actions {
+    margin-left: auto;
+  }
+  .btn {
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  :root {
+    --topbar-h: 58px;
+    --bottombar-h: 128px;
+  }
+
+  .brand-tag,
+  .chip {
+    display: none;
+  }
+
+  .panel-head .chip {
+    display: inline-flex;
+  }
+
+  .system-status {
+    padding: 4px 7px;
+    font-size: 7px;
+  }
+
+  .btn {
+    padding: 9px 11px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .btn--icon {
+    width: 32px;
+    height: 32px;
+    padding: 8px;
+  }
+
+  #startButton .btn-label {
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .top-actions {
+    gap: 6px;
+  }
+
+  .gesture-label {
+    font-size: 23px;
+  }
+
+  .readout-row {
+    padding: 6px 0;
+  }
+
+  .readout-row dt {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .readout-row dd {
+    font-size: 9.5px;
+  }
+
+  .mode-button {
+    padding: 7px 11px;
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+  }
+
+  .mode-button i {
+    display: none;
+  }
+
+  .bottom-actions .btn {
+    padding: 7px 9px;
+    font-size: 8px;
+  }
+
+  .tutorial {
+    padding: 14px;
+  }
+
+  .tutorial__card {
+    padding: 20px 18px 18px;
+  }
+
+  .tutorial__body {
+    font-size: 11.5px;
+  }
+
+  .toast {
+    font-size: 9px;
+    padding: 8px 12px;
+  }
+
+  .drawer__body {
+    padding: 16px;
+  }
+
+  .gesture-item {
+    grid-template-columns: 22px 1fr;
+    gap: 9px;
+  }
+
+  .gesture-item__key {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-name {
+    font-size: 11px;
+  }
+  .system-status {
+    display: none;
+  }
+  .gesture-label {
+    font-size: 20px;
+  }
+  .mode-button {
+    padding: 6px 9px;
+    font-size: 8px;
+  }
+}
+
+/* Landscape phones: shrink the vertical chrome so the scene stays visible */
+@media (max-height: 560px) and (orientation: landscape) and (max-width: 900px) {
+  :root {
+    --topbar-h: 52px;
+    --bottombar-h: 56px;
+  }
+
+  .hud {
+    flex-direction: row;
+    align-items: flex-start;
+    overflow: hidden;
+    gap: 10px;
+  }
+
+  .hud {
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .panel--vision {
+    order: 1;
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  .panel-column--right {
+    order: 2;
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  .bottombar {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .mode-selector {
+    flex: 1 1 auto;
+    min-width: 44%;
+    overflow-x: auto;
+  }
+
+  .bottom-actions {
+    flex: 0 0 auto;
+    width: auto;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .bottom-actions .btn {
+    padding: 6px 9px;
+    font-size: 8px;
+  }
+
+  .mode-button {
+    padding: 6px 10px;
+    font-size: 8px;
+  }
+
+  .camera-stage {
+    aspect-ratio: 16 / 10;
+    max-height: 30vh;
+  }
+
+  .panel--telemetry,
+  .manual-card {
+    display: none;
+  }
+
+  .event-log {
+    display: none;
+  }
+
+  .bottom-hints {
+    display: none;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --topbar-h: 52px;
+    --bottombar-h: 56px;
+  }
+  .camera-stage {
+    aspect-ratio: 16 / 9;
+    max-height: 34vh;
+  }
+  .gesture-label {
+    font-size: 20px;
+  }
+  .panel--vision {
+    gap: 8px;
+  }
+  .meter,
+  .event-log {
+    display: none;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

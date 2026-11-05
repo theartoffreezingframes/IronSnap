@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#04070f" />
+    <meta
+      name="description"
+      content="WONDER/SNAP — a real-time gesture-controlled holographic interface. MediaPipe hand tracking drives a Three.js particle universe."
+    />
+    <title>WONDER/SNAP — JARVIS Gesture Interface</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%2322d3ee'/%3E%3C/svg%3E"
+    />
+    <!-- Non-blocking web fonts: the UI is fully usable with the system fallbacks. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <canvas id="scene" class="scene" aria-hidden="true"></canvas>
+      <div class="scene-vignette" aria-hidden="true"></div>
+      <div class="scene-grid" aria-hidden="true"></div>
+
+      <!-- ── boot overlay ─────────────────────────────────────────── -->
+      <div id="boot" class="boot" role="status" aria-live="polite">
+        <div class="boot-mark">
+          <span class="boot-ring"></span>
+          <span class="boot-ring boot-ring--slow"></span>
+          <span class="boot-dot">◈</span>
+        </div>
+        <div class="boot-title">WONDER<span>/</span>SNAP</div>
+        <div class="boot-sub">JARVIS GESTURE INTERFACE</div>
+        <div class="boot-progress"><div id="bootBar" class="boot-progress__bar"></div></div>
+        <div id="bootStatus" class="boot-status">INITIALISING HOLOGRAPHIC SCENE</div>
+      </div>
+
+      <!-- ── top bar ──────────────────────────────────────────────── -->
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+              <path d="M12 2 21 12 12 22 3 12Z" />
+              <path d="M12 7.5 16.5 12 12 16.5 7.5 12Z" fill="currentColor" stroke="none" opacity="0.75" />
+            </svg>
+          </span>
+          <span class="brand-name">WONDER<span class="brand-slash">/</span>SNAP</span>
+          <span class="brand-tag">HOLOGRAPHIC GESTURE INTERFACE</span>
+        </div>
+
+        <div class="system-status" id="systemStatus" data-state="standby">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="systemState">SYSTEM STANDBY</span>
+        </div>
+
+        <div class="top-actions">
+          <button id="startButton" class="btn btn--primary" type="button">
+            <span class="btn-label">INITIALIZE CAMERA</span>
+          </button>
+          <button id="stopButton" class="btn" type="button" hidden>STOP CAMERA</button>
+          <button
+            id="soundButton"
+            class="btn btn--icon"
+            type="button"
+            aria-pressed="true"
+            aria-label="Toggle sound"
+            title="Sound (M)"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                d="M4 9v6h3.5L13 19V5L7.5 9H4z"
+                fill="currentColor"
+              />
+              <path
+                class="sound-waves"
+                d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span class="sr-only">Toggle sound</span>
+          </button>
+          <button
+            id="helpButton"
+            class="btn btn--icon"
+            type="button"
+            aria-haspopup="dialog"
+            aria-label="Open gesture reference"
+            title="Gesture map (H)"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <path d="M9.6 9.2a2.5 2.5 0 1 1 3.6 2.3c-.8.4-1.2 1-1.2 1.9v.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              <circle cx="12" cy="17" r="1" fill="currentColor" />
+            </svg>
+            <span class="sr-only">Gesture reference</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ── HUD ──────────────────────────────────────────────────── -->
+      <main class="hud">
+        <!-- left: gesture readout -->
+        <aside class="panel panel--vision" aria-label="Gesture telemetry">
+          <div class="panel-head">
+            <span class="eyebrow">GESTURE INPUT <b>/ 01</b></span>
+            <span class="chip" id="trackingChip">OFFLINE</span>
+          </div>
+
+          <div class="gesture-readout">
+            <div class="gesture-label" id="gestureState">STANDBY</div>
+            <div class="gesture-action" id="gestureAction">INITIALISE THE OPTICAL SENSOR</div>
+          </div>
+
+          <div class="meter" aria-hidden="true">
+            <div class="meter-head">
+              <span>TRACKING CONFIDENCE</span>
+              <b id="confidenceState">0%</b>
+            </div>
+            <div class="meter-track"><div id="confidenceBar" class="meter-fill"></div></div>
+          </div>
+
+          <dl class="readout">
+            <div class="readout-row">
+              <dt>HANDS DETECTED</dt>
+              <dd id="handsState">0</dd>
+            </div>
+            <div class="readout-row">
+              <dt>HANDEDNESS</dt>
+              <dd id="handedState">—</dd>
+            </div>
+            <div class="readout-row">
+              <dt>INFERENCE</dt>
+              <dd id="inferenceState">—</dd>
+            </div>
+            <div class="readout-row">
+              <dt>FRAME RATE</dt>
+              <dd id="fpsState">—</dd>
+            </div>
+            <div class="readout-row">
+              <dt>VISUAL MODE</dt>
+              <dd id="fieldMode">NEBULA</dd>
+            </div>
+          </dl>
+
+          <div class="event-log" id="eventLog" aria-live="polite">
+            <div class="event-log__empty">Awaiting gesture input…</div>
+          </div>
+
+          <button class="link-button" id="openReference" type="button">
+            GESTURE MAP <span aria-hidden="true">→</span>
+          </button>
+        </aside>
+
+        <!-- right: camera + system -->
+        <aside class="panel-column panel-column--right">
+          <section class="panel panel--camera" aria-label="Live camera feed">
+            <div class="panel-head">
+              <span class="eyebrow">OPTICAL SENSOR <b>/ LIVE</b></span>
+              <span class="chip chip--live" id="cameraChip">NO SIGNAL</span>
+            </div>
+
+            <div class="camera-stage" id="cameraStage">
+              <video id="webcam" class="camera-video" autoplay playsinline muted></video>
+              <canvas id="handOverlay" class="camera-overlay"></canvas>
+              <div class="camera-placeholder" id="cameraPlaceholder">
+                <span class="camera-placeholder__icon" aria-hidden="true">◎</span>
+                <strong>CAMERA STANDBY</strong>
+                <small>ALLOW ACCESS TO ENABLE HAND TRACKING</small>
+              </div>
+              <div class="camera-loading" id="cameraLoading" hidden>
+                <div class="spinner" aria-hidden="true"></div>
+                <span id="cameraLoadingText">INITIALISING…</span>
+                <div class="progress"><div id="cameraProgressBar"></div></div>
+              </div>
+              <div class="camera-scan" aria-hidden="true"></div>
+            </div>
+
+            <div class="camera-footer">
+              <span id="cameraState">NO SIGNAL</span>
+              <span id="delegateState">DELEGATE —</span>
+            </div>
+
+            <p class="camera-error" id="cameraError" hidden></p>
+          </section>
+
+          <section class="panel panel--telemetry" aria-label="Field telemetry">
+            <div class="panel-head">
+              <span class="eyebrow">FIELD TELEMETRY <b>/ 02</b></span>
+              <span class="chip" id="qualityChip">AUTO</span>
+            </div>
+            <dl class="readout readout--compact">
+              <div class="readout-row">
+                <dt>PARTICLES</dt>
+                <dd id="particleCount">—</dd>
+              </div>
+              <div class="readout-row">
+                <dt>FIELD SCALE</dt>
+                <dd id="fieldScale">1.00×</dd>
+              </div>
+              <div class="readout-row">
+                <dt>HAND SPAN</dt>
+                <dd id="handSpan">—</dd>
+              </div>
+              <div class="readout-row">
+                <dt>OVERDRIVE</dt>
+                <dd id="overdriveState">OFF</dd>
+              </div>
+            </dl>
+            <div class="mini-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </section>
+
+          <button class="panel manual-card" id="manualCard" type="button">
+            <span class="manual-card__title">KEYBOARD FALLBACK</span>
+            <span class="manual-card__body">No camera? Drive the field with the arrow keys, Q/E and Space.</span>
+            <span class="manual-card__cta">SHOW CONTROLS →</span>
+          </button>
+        </aside>
+      </main>
+
+      <!-- ── bottom bar ───────────────────────────────────────────── -->
+      <footer class="bottombar">
+        <div class="mode-selector" id="modeSelector" role="group" aria-label="Visual mode selector"></div>
+
+        <div class="bottom-hints">
+          <span><kbd>←→</kbd> MODE</span>
+          <span><kbd>SPACE</kbd> GRAB</span>
+          <span><kbd>Q</kbd><kbd>E</kbd> FIELD</span>
+          <span><kbd>R</kbd> RESET</span>
+        </div>
+
+        <div class="bottom-actions">
+          <button id="tutorialButton" class="btn btn--ghost" type="button">TUTORIAL</button>
+          <button id="resetButton" class="btn btn--ghost" type="button">
+            RESET FIELD <span aria-hidden="true">↺</span>
+          </button>
+        </div>
+      </footer>
+
+      <!-- ── gesture reference drawer ─────────────────────────────── -->
+      <div class="drawer" id="reference" role="dialog" aria-modal="true" aria-labelledby="referenceTitle" hidden>
+        <div class="drawer__backdrop" data-close-reference></div>
+        <div class="drawer__panel">
+          <header class="drawer__head">
+            <div>
+              <span class="eyebrow">REFERENCE <b>/ 03</b></span>
+              <h2 id="referenceTitle">GESTURE MAP</h2>
+            </div>
+            <button class="btn btn--icon" type="button" data-close-reference aria-label="Close reference">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+            </button>
+          </header>
+          <div class="drawer__body">
+            <div>
+              <h3 class="drawer__subhead">HAND GESTURES</h3>
+              <div class="gesture-grid" id="gestureGrid"></div>
+            </div>
+            <div>
+              <h3 class="drawer__subhead">KEYBOARD CONTROLS</h3>
+              <div class="key-grid" id="keyboardGrid"></div>
+            </div>
+            <p class="drawer__note">
+              Gestures must be held briefly (≈130 ms) before they register, and each discrete gesture has its own
+              cooldown so the interface cannot be spammed accidentally.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── tutorial ─────────────────────────────────────────────── -->
+      <div class="tutorial" id="tutorial" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle" hidden>
+        <div class="tutorial__card">
+          <div class="tutorial__meta">
+            <span class="eyebrow">BRIEFING <b id="tutorialStep">/ 01</b></span>
+            <button class="link-button" type="button" id="tutorialSkip">SKIP TUTORIAL</button>
+          </div>
+          <h2 class="tutorial__title" id="tutorialTitle">THE OPTICAL SENSOR</h2>
+          <p class="tutorial__body" id="tutorialBody"></p>
+          <p class="tutorial__hint" id="tutorialHint"></p>
+          <div class="tutorial__dots" id="tutorialDots" aria-hidden="true"></div>
+          <div class="tutorial__actions">
+            <button class="btn btn--ghost" type="button" id="tutorialPrev">BACK</button>
+            <button class="btn btn--primary" type="button" id="tutorialNext">NEXT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── toasts + live region ─────────────────────────────────── -->
+      <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+      <div class="sr-only" id="liveRegion" aria-live="assertive"></div>
+
+      <noscript>
+        <div class="noscript">WONDER/SNAP needs JavaScript and WebGL. Please enable JavaScript to continue.</div>
+      </noscript>
+    </div>
+  </body>
+</html>

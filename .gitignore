@@ -1,0 +1,17 @@
+node_modules
+dist
+.DS_Store
+*.log
+.vite
+
+# Generated at install time from node_modules/@mediapipe/tasks-vision/wasm
+public/wasm
+
+# Browser test artefacts
+tests/browser/artifacts
+
+# Local environment / secrets — never commit these
+.env
+.env.*
+!.env.example
+*.local

@@ -1,0 +1,28 @@
+{
+  "name": "wondersnap-jarvis",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WONDER/SNAP \u2014 a real-time, gesture-controlled holographic interface built with MediaPipe Hand Landmarker and Three.js",
+  "scripts": {
+    "postinstall": "node scripts/setup-assets.mjs",
+    "assets": "node scripts/setup-assets.mjs",
+    "dev": "node scripts/setup-assets.mjs && vite --host 0.0.0.0",
+    "build": "node scripts/setup-assets.mjs && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:browser": "node tests/browser/run.mjs",
+    "test:all": "npm test && npm run test:browser"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.14",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0",
+    "puppeteer-core": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
